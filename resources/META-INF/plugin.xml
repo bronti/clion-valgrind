@@ -26,7 +26,7 @@
   <depends>com.intellij.modules.clion</depends>
 
   <extensions defaultExtensionNs="com.intellij">
-    <!-- Add your extensions here -->
+    <configurationType implementation="ru.spbau.devdays.clionvalgrind.run.configuration.ValgrindRunConfigurationType"/>
   </extensions>
 
   <actions>
