@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 public class ValgrindConfigurationFactory extends ConfigurationFactory {
     private static final String FACTORY_NAME = "Valgrind configuration factory";
 
-    private ValgrindConfigurationFactory(ConfigurationType type) {
+    protected ValgrindConfigurationFactory(ConfigurationType type) {
         super(type);
     }
 
