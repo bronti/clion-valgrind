@@ -33,9 +33,9 @@ public class ValgrindRunConfiguration extends RunConfigurationBase {
     @Override
     public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment executionEnvironment) throws ExecutionException {
         // todo: only run/debug/wcoverage
-        // todo:
-        String pathToExecutable = "cmake-build-debug/" + executionEnvironment.getProject().getName();
-        String pathToXml = "cmake-build-debug/" + executionEnvironment.getProject().getName() + "-valgrind-results.xml";
+        // todo: String -> Path
+        String pathToExecutable = "/cmake-build-debug/" + executionEnvironment.getProject().getName();
+        String pathToXml = "/cmake-build-debug/" + executionEnvironment.getProject().getName() + "-valgrind-results.xml";
         GeneralCommandLine cl = new GeneralCommandLine("valgrind", "--xml=yes", "--xml-file=" + pathToXml, pathToExecutable);
         cl = cl.withWorkDirectory(executionEnvironment.getProject().getBasePath());
         return new ValgrindCommandLineState(executionEnvironment, pathToXml, cl);

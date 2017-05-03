@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ErrorsHolder {
-    private List<Error> errorList = new ArrayList<Error>();
+    //todo: make ErrorsHolder implement Iterable (!!)
+    // (я пока сделала errorList пабликом, т к торопилась. потом,
+    // когда ErrorsHolder будет итерабл (или как-то еще конвертироваться в стрим) надо будет поменять
+    public List<Error> errorList = new ArrayList<Error>();
 
     public void add(Error error) {
         errorList.add(error);

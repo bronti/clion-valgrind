@@ -21,12 +21,17 @@ import com.intellij.util.ui.ColumnInfo;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.spbau.devdays.clionvalgrind.parser.errors.Error;
+import ru.spbau.devdays.clionvalgrind.parser.errors.ErrorsHolder;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
 import java.awt.*;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by bronti on 03.05.17.
@@ -39,19 +44,33 @@ import java.awt.*;
 
 public class ValgrindConsoleView implements ConsoleView {
 
-    private final JBSplitter mainPanel;
-    private final Project project;
-    private final ConsoleView console;
+    private @NotNull final JBSplitter mainPanel;
+    private @NotNull final Project project;
+    private @NotNull final ConsoleView console;
+    private @NotNull final ErrorsHolder errors;
 
 //    private static final int CONSOLE_COLUMN_MIN_WIDTH = 300;
 //    private static final int ERRORS_COLUMN_MIN_WIDTH  = 300;
 
-    public ValgrindConsoleView(final Project project, ConsoleView console) {
+    public ValgrindConsoleView(@NotNull final Project project, @NotNull ConsoleView console, @NotNull ErrorsHolder errors) {
         this.project = project;
         this.console = console;
+        this.errors = errors;
         mainPanel = new JBSplitter();
         mainPanel.setFirstComponent(console.getComponent());
-        JTextArea text = new JTextArea("Ololo!!!");
+
+        // todo: fix when ErrorsHolder becomes Iterable
+        String allErrors = errors.errorList
+                .stream()
+                .map(Error::getKind)
+                .collect(Collectors.joining("\n"));
+
+        // todo: uncomment when troubles with xml resolved
+//        JTextArea text = new JTextArea(allErrors);
+
+        JTextArea text = new JTextArea("main.cpp:5 memory leak, все дела.\n\n Здесь должны отображаться ошибки, но пока нет, т к я накосячила с путем к xml'ке и пока не успела разобраться");
+        text.setEditable(false);
+
         mainPanel.setSecondComponent(text);
     }
 

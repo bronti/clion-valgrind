@@ -20,6 +20,8 @@ import ru.spbau.devdays.clionvalgrind.results.ValgrindRunConsoleBuilder;
 public class ValgrindCommandLineState extends CommandLineState {
 
     private GeneralCommandLine commandLine;
+
+    // todo: can change?
     private String pathToXml;
 
     public ValgrindCommandLineState(ExecutionEnvironment executionEnvironment, String pathToXml, GeneralCommandLine commandLine)
@@ -38,7 +40,7 @@ public class ValgrindCommandLineState extends CommandLineState {
         ColoredProcessHandler process = new ColoredProcessHandler(commandLine);
         console.attachToProcess(process);
 
-        setConsoleBuilder(new ValgrindRunConsoleBuilder(project, console));
+        setConsoleBuilder(new ValgrindRunConsoleBuilder(project, console, pathToXml));
         ProcessTerminatedListener.attach(process);
         return process;
     }

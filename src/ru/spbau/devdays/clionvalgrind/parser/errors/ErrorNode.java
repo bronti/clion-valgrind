@@ -3,6 +3,7 @@ package ru.spbau.devdays.clionvalgrind.parser.errors;
 import java.util.List;
 
 public class ErrorNode {
+
     private String what;
     private List<String> funcList;
     private List<String> dirList;

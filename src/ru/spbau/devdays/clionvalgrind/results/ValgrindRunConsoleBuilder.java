@@ -6,8 +6,11 @@ import com.intellij.execution.filters.TextConsoleBuilder;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.spbau.devdays.clionvalgrind.parser.Parser;
+import ru.spbau.devdays.clionvalgrind.parser.errors.ErrorsHolder;
 
 import java.util.ArrayList;
 
@@ -18,10 +21,12 @@ public class ValgrindRunConsoleBuilder extends TextConsoleBuilder {
     private final Project project;
     private final ArrayList<Filter> myFilters = Lists.newArrayList();
     private ConsoleView console;
+    private String pathToXml;
 
-    public ValgrindRunConsoleBuilder(final Project project, ConsoleView console) {
+    public ValgrindRunConsoleBuilder(final Project project, ConsoleView console, String pathToXml) {
         this.project = project;
         this.console = console;
+        this.pathToXml = pathToXml;
     }
 
     @Override
@@ -34,7 +39,16 @@ public class ValgrindRunConsoleBuilder extends TextConsoleBuilder {
     }
 
     protected ConsoleView createConsole() {
-        return new ValgrindConsoleView(project, console);
+        ErrorsHolder errors;
+        try {
+            errors = Parser.parse(pathToXml);
+        }
+        catch (Exception ex) {
+            // todo: fix!!!!!!!!!!!
+//            throw new IllegalStateException();
+            errors = new ErrorsHolder();
+        }
+        return new ValgrindConsoleView(project, console, errors);
     }
 
     @Override

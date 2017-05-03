@@ -61,6 +61,11 @@ public class Parser {
     }
 
     public static ErrorsHolder parse(String path) throws ParserConfigurationException, IOException, SAXException {
+
+        // todo: FileNot Found на "/cmake-build-debug/cpptest-valgrind-results.xml"
+        // так и должно быть? я не стала разбираться что не так.
+        // починишь?
+
         File inputFile = new File(path);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbFactory.newDocumentBuilder();
