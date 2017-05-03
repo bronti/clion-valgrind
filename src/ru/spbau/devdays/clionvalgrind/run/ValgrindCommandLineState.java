@@ -37,7 +37,7 @@ public class ValgrindCommandLineState extends CommandLineState {
     @Override
     public ExecutionResult execute(@NotNull Executor executor, @NotNull ProgramRunner runner) throws ExecutionException {
 //        return BringConsoleToFrontExecutionResult(super.execute(executor, runner), getEnvironment(), executor);
-        return super.execute(executor, runner);
+        return new ValgrindExecutionResult(super.execute(executor, runner));
     }
 
 }
