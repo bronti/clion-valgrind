@@ -14,7 +14,7 @@ import ru.spbau.devdays.clionvalgrind.run.ValgrindCommandLineState;
  * Created by bronti on 02.05.17.
  */
 
-public class ValgrindRunConfiguration  extends RunConfigurationBase {
+public class ValgrindRunConfiguration extends RunConfigurationBase {
     protected ValgrindRunConfiguration(Project project, ConfigurationFactory factory, String name) {
         super(project, factory, name);
     }
@@ -32,13 +32,12 @@ public class ValgrindRunConfiguration  extends RunConfigurationBase {
     @Nullable
     @Override
     public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment executionEnvironment) throws ExecutionException {
+        // todo: only run/debug/wcoverage
         // todo:
-        String executable = "cmake-build-debug/" + executionEnvironment.getProject().getName();
-        GeneralCommandLine cl = new GeneralCommandLine("valgrind", executable).withWorkDirectory(executionEnvironment.getProject().getBasePath());
-        return createCommandLineState(executionEnvironment, cl);
-    }
-
-    private RunProfileState createCommandLineState(@NotNull ExecutionEnvironment executionEnvironment, GeneralCommandLine commandLine) {
-        return new ValgrindCommandLineState(executionEnvironment, commandLine);
+        String pathToExecutable = "cmake-build-debug/" + executionEnvironment.getProject().getName();
+        String pathToXml = "cmake-build-debug/" + executionEnvironment.getProject().getName() + "-valgrind-results.xml";
+        GeneralCommandLine cl = new GeneralCommandLine("valgrind", "--xml=yes", "--xml-file=" + pathToXml, pathToExecutable);
+        cl = cl.withWorkDirectory(executionEnvironment.getProject().getBasePath());
+        return new ValgrindCommandLineState(executionEnvironment, pathToXml, cl);
     }
 }

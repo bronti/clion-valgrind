@@ -18,7 +18,7 @@ import java.util.List;
 
 public class Parser {
 
-    private ErrorNode stackNode(Node node, String what) {
+    private static ErrorNode stackNode(Node node, String what) {
 
         NodeList frames = node.getChildNodes();
         List<String> dirList = new ArrayList<String>();
@@ -60,7 +60,7 @@ public class Parser {
         return new ErrorNode(what, funcList, dirList, lineNumber);
     }
 
-    public ErrorsHolder parse(String path) throws ParserConfigurationException, IOException, SAXException {
+    public static ErrorsHolder parse(String path) throws ParserConfigurationException, IOException, SAXException {
         File inputFile = new File(path);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbFactory.newDocumentBuilder();

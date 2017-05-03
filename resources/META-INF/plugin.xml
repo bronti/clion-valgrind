@@ -27,6 +27,8 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <configurationType implementation="ru.spbau.devdays.clionvalgrind.run.configuration.ValgrindRunConfigurationType"/>
+    <!--<toolWindow id="Valgrind Results" secondary="true" icon="/pngs/icon.png" anchor="bottom" factoryClass="ru.spbau.devdays.clionvalgrind.results.ValgrindResultsWindowFactory"/>-->
+    <!--<toolWindow id="Sample Calendar" secondary="true" icon="/myToolWindow/plus.png" anchor="right"-->
   </extensions>
 
   <actions>
