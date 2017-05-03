@@ -17,9 +17,11 @@ import java.util.ArrayList;
 public class ValgrindRunConsoleBuilder extends TextConsoleBuilder {
     private final Project project;
     private final ArrayList<Filter> myFilters = Lists.newArrayList();
+    private ConsoleView console;
 
-    public ValgrindRunConsoleBuilder(final Project project) {
+    public ValgrindRunConsoleBuilder(final Project project, ConsoleView console) {
         this.project = project;
+        this.console = console;
     }
 
     @Override
@@ -32,7 +34,7 @@ public class ValgrindRunConsoleBuilder extends TextConsoleBuilder {
     }
 
     protected ConsoleView createConsole() {
-        return null;
+        return new ValgrindConsoleView(project, console);
     }
 
     @Override
@@ -43,5 +45,4 @@ public class ValgrindRunConsoleBuilder extends TextConsoleBuilder {
     @Override
     public void setViewer(boolean isViewer) {
     }
-
 }
