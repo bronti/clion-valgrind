@@ -11,6 +11,7 @@ import com.intellij.execution.process.ProcessTerminatedListener;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.ProgramRunner;
 import org.jetbrains.annotations.NotNull;
+import ru.spbau.devdays.clionvalgrind.results.ValgrindExecutionResult;
 
 /**
  * Created by bronti on 02.05.17.

@@ -1,4 +1,4 @@
-package ru.spbau.devdays.clionvalgrind.run;
+package ru.spbau.devdays.clionvalgrind.results;
 
 import com.intellij.execution.ExecutionResult;
 import com.intellij.execution.process.ProcessHandler;
@@ -13,7 +13,7 @@ public class ValgrindExecutionResult implements ExecutionResult {
 
     private ExecutionResult result;
 
-    ValgrindExecutionResult(ExecutionResult exexutionResult) {
+    public ValgrindExecutionResult(ExecutionResult exexutionResult) {
         this.result = exexutionResult;
     }
 

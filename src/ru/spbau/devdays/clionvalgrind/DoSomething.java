@@ -8,6 +8,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
  * Created by bronti on 02.05.17.
  */
 
+// todo:
 public class DoSomething extends AnAction {
 
     @Override
