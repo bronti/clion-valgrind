@@ -1,5 +1,6 @@
 package ru.spbau.devdays.clionvalgrind.parser;
 
+import com.google.protobuf.TextFormat;
 import ru.spbau.devdays.clionvalgrind.parser.errors.Error;
 import ru.spbau.devdays.clionvalgrind.parser.errors.ErrorNode;
 import ru.spbau.devdays.clionvalgrind.parser.errors.ErrorsHolder;
@@ -7,6 +8,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import ru.spbau.devdays.clionvalgrind.parser.exception.ParserException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,7 +20,7 @@ import java.util.List;
 
 public class Parser {
 
-    private ErrorNode stackNode(Node node, String what) {
+    private static ErrorNode stackNode(Node node, String what) {
 
         NodeList frames = node.getChildNodes();
         List<String> dirList = new ArrayList<String>();
@@ -60,11 +62,21 @@ public class Parser {
         return new ErrorNode(what, funcList, dirList, lineNumber);
     }
 
-    public ErrorsHolder parse(String path) throws ParserConfigurationException, IOException, SAXException {
+    public static ErrorsHolder parse(String path) {
         File inputFile = new File(path);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbFactory.newDocumentBuilder();
-        Document doc = db.parse(inputFile);
+        DocumentBuilder db = null;
+        Document doc = null;
+        try {
+            db = dbFactory.newDocumentBuilder();
+            doc = db.parse(inputFile);
+        } catch (ParserConfigurationException e) {
+            throw new ParserException("cannot build new DocumentBuilder");
+        } catch (IOException e) {
+            throw new ParserException("cannot read file: " + path);
+        } catch (SAXException e) {
+            throw new ParserException("cannot parse file: " + path);
+        }
         doc.getDocumentElement().normalize();
 
         ErrorsHolder errorsHolder = new ErrorsHolder();
