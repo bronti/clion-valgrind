@@ -62,7 +62,7 @@ public class Parser {
         return new ErrorNode(what, funcList, dirList, lineNumber);
     }
 
-    public static ErrorsHolder parse(String path) {
+    public static ErrorsHolder parse(String path) throws ParserException {
         File inputFile = new File(path);
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = null;
