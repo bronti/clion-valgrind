@@ -1,5 +1,7 @@
 package ru.spbau.devdays.clionvalgrind.parser.errors;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,5 +18,12 @@ public class ErrorsHolder {
 
     public Error get(int i) {
         return errorList.get(i);
+    }
+
+    void print(OutputStream os) throws IOException {
+        for (Error anErrorList : errorList) {
+            anErrorList.print(os);
+            os.write(System.lineSeparator().getBytes());
+        }
     }
 }

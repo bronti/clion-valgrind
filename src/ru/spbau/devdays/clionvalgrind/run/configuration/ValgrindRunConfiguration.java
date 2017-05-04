@@ -12,8 +12,6 @@ import com.jetbrains.cidr.cpp.cmake.model.CMakeListener;
 import com.jetbrains.cidr.cpp.cmake.model.CMakeMessage;
 import com.jetbrains.cidr.cpp.cmake.workspace.CMakeWorkspace;
 import com.intellij.openapi.util.Pair;
-import com.jetbrains.cidr.cpp.execution.CMakeAppRunConfiguration;
-import com.jetbrains.cidr.cpp.toolchains.CMake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.spbau.devdays.clionvalgrind.run.ValgrindCommandLineState;
@@ -46,7 +44,8 @@ public class ValgrindRunConfiguration  extends RunConfigurationBase {
 
         CMakeWorkspace cMakeWorkspace = CMakeWorkspace.getInstance(myProject);
 
-        List<CMakeSettings.Configuration> configurations = cMakeWorkspace.getSettings().getConfigurations();
+        List<CMakeSettings.Configuration> configurations =
+                cMakeWorkspace.getSettings().getConfigurations();
         if (configurations.isEmpty()) {
             throw new RuntimeException();
         }
@@ -63,13 +62,15 @@ public class ValgrindRunConfiguration  extends RunConfigurationBase {
         List<File> configDir = cMakeWorkspace.getEffectiveConfigurationGenerationDirs(
                 Arrays.asList(Pair.create(selectedConfigurationName, null)));
 
-        String executable = configDir.get(0).getAbsolutePath() + "/" + executionEnvironment.getProject().getName();
+        String executable = configDir.get(0).getAbsolutePath() + "/"
+                            + executionEnvironment.getProject().getName();
         GeneralCommandLine cl = new GeneralCommandLine("valgrind", executable)
                                     .withWorkDirectory(executionEnvironment.getProject().getBasePath());
         return createCommandLineState(executionEnvironment, cl);
     }
 
-    private RunProfileState createCommandLineState(@NotNull ExecutionEnvironment executionEnvironment, GeneralCommandLine commandLine) {
+    private RunProfileState createCommandLineState(@NotNull ExecutionEnvironment executionEnvironment,
+                                                   GeneralCommandLine commandLine) {
         return new ValgrindCommandLineState(executionEnvironment, commandLine);
     }
 }

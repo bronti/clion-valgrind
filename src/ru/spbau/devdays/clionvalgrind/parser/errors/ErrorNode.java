@@ -1,5 +1,7 @@
 package ru.spbau.devdays.clionvalgrind.parser.errors;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 public class ErrorNode {
@@ -14,5 +16,21 @@ public class ErrorNode {
         this.funcList = funcList;
         this.dirList = dirList;
         this.lineNumber = lineNumber;
+    }
+
+    void print(OutputStream os) throws IOException {
+        os.write(("\t" + what).getBytes());
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < funcList.size(); i++) {
+            sb.append(funcList.get(i));
+            if (!lineNumber.get(i).equals(-1)) {
+                sb.append(':');
+                sb.append(lineNumber.get(i));
+            }
+            sb.append(" in ");
+            sb.append(dirList.get(i));
+            sb.append(System.lineSeparator());
+        }
+        os.write(sb.toString().getBytes());
     }
 }
