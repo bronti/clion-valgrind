@@ -2,6 +2,8 @@ package ru.spbau.devdays.clionvalgrind.results;
 
 import com.intellij.execution.filters.Filter;
 import com.intellij.execution.filters.HyperlinkInfo;
+import com.intellij.execution.filters.RegexpFilter;
+import com.intellij.execution.impl.EditorHyperlinkSupport;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;
@@ -11,6 +13,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.actionSystem.EditorActionManager;
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.impl.DocumentImpl;
 import com.intellij.openapi.editor.impl.EditorFactoryImpl;
 import com.intellij.openapi.editor.impl.EditorImpl;
@@ -55,6 +58,9 @@ public class ValgrindConsoleView implements ConsoleView {
     private @NotNull final Project project;
     private @NotNull final ConsoleView console;
     private @NotNull final ErrorsHolder errors;
+    private @NotNull final Editor errorsEditor;
+
+    private EditorHyperlinkSupport hyperlinks;
 
 //    private static final int CONSOLE_COLUMN_MIN_WIDTH = 300;
 //    private static final int ERRORS_COLUMN_MIN_WIDTH  = 300;
@@ -73,16 +79,19 @@ public class ValgrindConsoleView implements ConsoleView {
                 .map(Error::getKind)
                 .collect(Collectors.joining("\n"));
 
-
-        String tmp = "main.cpp:5 memory leak, все дела.\n\nЗдесь должны отображаться ошибки, но пока нет, т к я накосячила с путем к xml'ке и пока не успела разобраться";
-
-//        JTextArea text = new JTextArea(allErrors);
+        allErrors = "/home/bronti/all/au/devDays/test/cpptest/main.cpp:5\n\n\n";
 
         EditorFactory editorFactory = new EditorFactoryImpl(EditorActionManager.getInstance());
-        Editor errorsEditor = editorFactory.createViewer(editorFactory.createDocument(tmp), project);
 
-        // todo: uncomment when troubles with xml resolved
-//        EditorImpl text = new EditorImpl(new DocumentImpl(allErrors), true, project);
+        RegexpFilter fileRefsFilter = new RegexpFilter(project, "$FILE_PATH$:$LINE$");
+        // todo: crazy shit ):
+        errorsEditor = editorFactory.createViewer(editorFactory.createDocument(allErrors), project);
+        hyperlinks = new EditorHyperlinkSupport(errorsEditor, project);
+        hyperlinks.highlightHyperlinks(fileRefsFilter, 0,1);
+
+//        ValgrindErrorsConsoleView errorsView = new ValgrindErrorsConsoleView(project, allErrors);
+
+
 
         mainPanel.setSecondComponent(errorsEditor.getComponent());
     }
@@ -93,7 +102,9 @@ public class ValgrindConsoleView implements ConsoleView {
     }
 
     @Override
-    public void dispose() {}
+    public void dispose() {
+        hyperlinks = null;
+    }
 
     @Override
     public void print(@NotNull String s, @NotNull ConsoleViewContentType contentType) {}

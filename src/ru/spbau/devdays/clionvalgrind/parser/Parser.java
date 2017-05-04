@@ -15,8 +15,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Parser {
 
@@ -71,11 +75,16 @@ public class Parser {
             db = dbFactory.newDocumentBuilder();
             doc = db.parse(inputFile);
         } catch (ParserConfigurationException e) {
-            throw new ParserException("cannot build new DocumentBuilder");
+            throw new ParserException("cannot build new DocumentBuilder", e);
         } catch (IOException e) {
-            throw new ParserException("cannot read file: " + path);
+            throw new ParserException("cannot read file: " + path, e);
         } catch (SAXException e) {
-            throw new ParserException("cannot parse file: " + path);
+            try {
+                System.out.print(Files.readAllLines(Paths.get(path), StandardCharsets.UTF_8).stream().collect(Collectors.joining("\n")));
+            }
+            catch(IOException ex) {
+            }
+            throw new ParserException("cannot parse file: " + path, e);
         }
         doc.getDocumentElement().normalize();
 
