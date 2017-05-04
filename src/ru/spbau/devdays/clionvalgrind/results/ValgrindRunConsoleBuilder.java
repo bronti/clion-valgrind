@@ -44,9 +44,7 @@ public class ValgrindRunConsoleBuilder extends TextConsoleBuilder {
             errors = Parser.parse(pathToXml);
         }
         catch (Exception ex) {
-            // todo: fix!!!!!!!!!!!
-//            throw new IllegalStateException();
-            errors = new ErrorsHolder();
+            throw new IllegalStateException();
         }
         return new ValgrindConsoleView(project, console, errors);
     }

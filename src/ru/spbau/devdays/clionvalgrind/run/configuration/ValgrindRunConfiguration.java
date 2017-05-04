@@ -35,10 +35,7 @@ public class ValgrindRunConfiguration extends RunConfigurationBase {
     public void checkConfiguration() throws RuntimeConfigurationException {
     }
 
-    @Nullable
-    @Override
-    public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment executionEnvironment) throws ExecutionException {
-
+    private String getBuildDir() {
         CMakeWorkspace cMakeWorkspace = CMakeWorkspace.getInstance(myProject);
 
         List<CMakeSettings.Configuration> configurations =
@@ -56,10 +53,17 @@ public class ValgrindRunConfiguration extends RunConfigurationBase {
         String selectedConfigurationName = selectedConfiguration.getConfigName();
 
         // get the path of generated files of the selected configuration
-        List<File> configDir = cMakeWorkspace.getEffectiveConfigurationGenerationDirs(
+        List<File> buildDir = cMakeWorkspace.getEffectiveConfigurationGenerationDirs(
                 Arrays.asList(Pair.create(selectedConfigurationName, null)));
+        return buildDir.get(0).getAbsolutePath();
 
-        String executable = configDir.get(0).getAbsolutePath() + "/"
+    }
+
+    @Nullable
+    @Override
+    public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment executionEnvironment) throws ExecutionException {
+
+        String executable = getBuildDir() + "/"
                             + executionEnvironment.getProject().getName();
         GeneralCommandLine cl = new GeneralCommandLine("valgrind", executable)
                                     .withWorkDirectory(executionEnvironment.getProject().getBasePath());
@@ -70,8 +74,8 @@ public class ValgrindRunConfiguration extends RunConfigurationBase {
                                                    GeneralCommandLine commandLine) {
         // todo: only run/debug/wcoverage
         // todo: String -> Path
-        String pathToExecutable = "/cmake-build-debug/" + executionEnvironment.getProject().getName();
-        String pathToXml = "/cmake-build-debug/" + executionEnvironment.getProject().getName() + "-valgrind-results.xml";
+        String pathToExecutable = getBuildDir() + "/" + executionEnvironment.getProject().getName();
+        String pathToXml = getBuildDir() + "/" + executionEnvironment.getProject().getName() + "-valgrind-results.xml";
         GeneralCommandLine cl = new GeneralCommandLine("valgrind", "--xml=yes", "--xml-file=" + pathToXml, pathToExecutable);
         cl = cl.withWorkDirectory(executionEnvironment.getProject().getBasePath());
         return new ValgrindCommandLineState(executionEnvironment, pathToXml, cl);
