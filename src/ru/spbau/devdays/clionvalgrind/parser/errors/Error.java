@@ -1,5 +1,6 @@
 package ru.spbau.devdays.clionvalgrind.parser.errors;
 
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -29,6 +30,14 @@ public class Error {
     }
     public void setKind(String kind) {
         this.kind = kind;
+    }
+
+    public DefaultMutableTreeNode getTree() {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(kind);
+        for (ErrorNode anErrorNode: errorNodeList) {
+            root.add(anErrorNode.getTree());
+        }
+        return root;
     }
 
     public String toString() {

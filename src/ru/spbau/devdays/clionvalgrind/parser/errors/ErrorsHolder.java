@@ -1,5 +1,6 @@
 package ru.spbau.devdays.clionvalgrind.parser.errors;
 
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -18,6 +19,22 @@ public class ErrorsHolder {
 
     public Error get(int i) {
         return errorList.get(i);
+    }
+
+//    public List<Integer> getLineNumber() {
+//        return
+//    }
+
+    public DefaultMutableTreeNode getTree() {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(
+                    "Valgrind Memory Analyzer finished, " + errorList.size()
+                              + " issues were found"
+        );
+
+        for (Error anError: errorList) {
+            root.add(anError.getTree());
+        }
+        return root;
     }
 
     public String toString() {

@@ -20,6 +20,7 @@ import com.intellij.ui.*;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.ui.treeStructure.SimpleTreeBuilder;
 import com.intellij.ui.treeStructure.SimpleTreeStructure;
+import com.intellij.ui.treeStructure.Tree;
 import com.intellij.ui.treeStructure.treetable.ListTreeTableModelOnColumns;
 import com.intellij.ui.treeStructure.treetable.TreeColumnInfo;
 import com.intellij.ui.treeStructure.treetable.TreeTable;
@@ -67,14 +68,18 @@ public class ValgrindConsoleView implements ConsoleView {
         JComponent consoleComponent = console.getComponent();
         mainPanel.setFirstComponent(consoleComponent);
 
-        String tmp = errors.toString();
-        EditorFactory editorFactory = new EditorFactoryImpl(EditorActionManager.getInstance());
-        Editor errorsEditor = editorFactory.createViewer(editorFactory.createDocument(tmp), project);
+        JTree tree = new Tree(errors.getTree());
+        tree.add(new JScrollBar(Adjustable.HORIZONTAL));
+//        tree.add("hello", new JLabel("world"));
+//        String tmp = errors.toString();
+//        EditorFactory editorFactory = new EditorFactoryImpl(EditorActionManager.getInstance());
+//        Editor errorsEditor = editorFactory.createViewer(editorFactory.createDocument(tmp), project);
 
         // todo: uncomment when troubles with xml resolved
 //        EditorImpl text = new EditorImpl(new DocumentImpl(allErrors), true, project);
 
-        mainPanel.setSecondComponent(errorsEditor.getComponent());
+        mainPanel.setSecondComponent(tree);
+//        mainPanel.setSecondComponent(errorsEditor.getComponent());
     }
 
     @Override

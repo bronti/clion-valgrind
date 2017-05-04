@@ -1,5 +1,7 @@
 package ru.spbau.devdays.clionvalgrind.parser.errors;
 
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
@@ -17,6 +19,27 @@ public class ErrorNode {
         this.funcList = funcList;
         this.dirList = dirList;
         this.lineNumber = lineNumber;
+    }
+
+    List<Integer> getLineNumber() {
+        return lineNumber;
+    }
+
+    public DefaultMutableTreeNode getTree() {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(what);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < funcList.size(); i++) {
+            sb.append(funcList.get(i));
+            sb.append(" in ");
+            sb.append(dirList.get(i));
+            if (!lineNumber.get(i).equals(-1)) {
+                sb.append(':');
+                sb.append(lineNumber.get(i));
+            }
+            root.add(new DefaultMutableTreeNode(sb.toString()));
+            sb.setLength(0);
+        }
+        return root;
     }
 
     public String toString() {
