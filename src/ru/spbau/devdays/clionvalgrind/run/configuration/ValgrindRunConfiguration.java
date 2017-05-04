@@ -3,20 +3,31 @@ package ru.spbau.devdays.clionvalgrind.run.configuration;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.*;
+import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
+import com.jetbrains.cidr.cpp.cmake.CMakeSettings;
+import com.jetbrains.cidr.cpp.cmake.model.CMakeListener;
+import com.jetbrains.cidr.cpp.cmake.model.CMakeMessage;
+import com.jetbrains.cidr.cpp.cmake.workspace.CMakeWorkspace;
+import com.intellij.openapi.util.Pair;
+import com.jetbrains.cidr.cpp.execution.CMakeAppRunConfiguration;
+import com.jetbrains.cidr.cpp.toolchains.CMake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.spbau.devdays.clionvalgrind.run.ValgrindCommandLineState;
 
-/**
- * Created by bronti on 02.05.17.
- */
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 public class ValgrindRunConfiguration  extends RunConfigurationBase {
+    Project myProject;
+
     protected ValgrindRunConfiguration(Project project, ConfigurationFactory factory, String name) {
         super(project, factory, name);
+        myProject = project;
     }
 
     @NotNull
@@ -32,9 +43,29 @@ public class ValgrindRunConfiguration  extends RunConfigurationBase {
     @Nullable
     @Override
     public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment executionEnvironment) throws ExecutionException {
-        // todo:
-        String executable = "cmake-build-debug/" + executionEnvironment.getProject().getName();
-        GeneralCommandLine cl = new GeneralCommandLine("valgrind", executable).withWorkDirectory(executionEnvironment.getProject().getBasePath());
+
+        CMakeWorkspace cMakeWorkspace = CMakeWorkspace.getInstance(myProject);
+
+        List<CMakeSettings.Configuration> configurations = cMakeWorkspace.getSettings().getConfigurations();
+        if (configurations.isEmpty()) {
+            throw new RuntimeException();
+        }
+
+        // select the first configuration in the list
+        // cannot get active configuration for the current project.
+        // code from https://intellij-support.jetbrains.com
+        // /hc/en-us/community/posts/115000107544-CLion-Get-cmake-output-directory
+        // doesn't work
+        CMakeSettings.Configuration selectedConfiguration = configurations.get(0);
+        String selectedConfigurationName = selectedConfiguration.getConfigName();
+
+        // get the path of generated files of the selected configuration
+        List<File> configDir = cMakeWorkspace.getEffectiveConfigurationGenerationDirs(
+                Arrays.asList(Pair.create(selectedConfigurationName, null)));
+
+        String executable = configDir.get(0).getAbsolutePath() + "/" + executionEnvironment.getProject().getName();
+        GeneralCommandLine cl = new GeneralCommandLine("valgrind", executable)
+                                    .withWorkDirectory(executionEnvironment.getProject().getBasePath());
         return createCommandLineState(executionEnvironment, cl);
     }
 
