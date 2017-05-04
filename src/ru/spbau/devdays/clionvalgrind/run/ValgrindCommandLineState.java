@@ -36,12 +36,10 @@ public class ValgrindCommandLineState extends CommandLineState {
     protected ProcessHandler startProcess() throws ExecutionException {
         Project project = getEnvironment().getProject();
 
-        ConsoleView console = TextConsoleBuilderFactory.getInstance().createBuilder(project).getConsole();
         ColoredProcessHandler process = new ColoredProcessHandler(commandLine);
-        console.attachToProcess(process);
 
-        setConsoleBuilder(new ValgrindRunConsoleBuilder(project, console, pathToXml));
-        ProcessTerminatedListener.attach(process);
+        setConsoleBuilder(new ValgrindRunConsoleBuilder(project, process, pathToXml));
+        ProcessTerminatedListener.attach(process, project);
         return process;
     }
 }

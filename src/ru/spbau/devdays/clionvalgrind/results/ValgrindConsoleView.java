@@ -9,6 +9,7 @@ import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
@@ -31,6 +32,7 @@ import com.intellij.util.ui.ColumnInfo;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.spbau.devdays.clionvalgrind.parser.Parser;
 import ru.spbau.devdays.clionvalgrind.parser.errors.Error;
 import ru.spbau.devdays.clionvalgrind.parser.errors.ErrorsHolder;
 
@@ -54,46 +56,69 @@ import java.util.stream.Stream;
 
 public class ValgrindConsoleView implements ConsoleView {
 
+    private static final String DEFAULT_ERRORS_TEXT = "Nothing to show yet.\n";
+    private static final String ERROR_ERRORS_TEXT = "error\n";
+
     private @NotNull final JBSplitter mainPanel;
     private @NotNull final Project project;
     private @NotNull final ConsoleView console;
-    private @NotNull final ErrorsHolder errors;
-    private @NotNull final Editor errorsEditor;
+    private @NotNull Editor errorsEditor;
+    private @NotNull final String pathToXml;
+    private @NotNull final RegexpFilter fileRefsFilter;
 
     private EditorHyperlinkSupport hyperlinks;
 
 //    private static final int CONSOLE_COLUMN_MIN_WIDTH = 300;
 //    private static final int ERRORS_COLUMN_MIN_WIDTH  = 300;
 
-    public ValgrindConsoleView(@NotNull final Project project, @NotNull ConsoleView console, @NotNull ErrorsHolder errors) {
+    public ValgrindConsoleView(@NotNull final Project project, @NotNull ConsoleView console, @NotNull String pathToXml) {
         this.project = project;
         this.console = console;
-        this.errors = errors;
+        this.pathToXml = pathToXml;
         mainPanel = new JBSplitter();
         JComponent consoleComponent = console.getComponent();
         mainPanel.setFirstComponent(consoleComponent);
 
-        // todo: fix when ErrorsHolder becomes Iterable
-        String allErrors = errors.errorList
-                .stream()
-                .map(Error::getKind)
-                .collect(Collectors.joining("\n"));
-
-        allErrors = "/home/bronti/all/au/devDays/test/cpptest/main.cpp:5\n\n\n";
+//        // todo: fix when ErrorsHolder becomes Iterable
+//        String allErrors = errors.errorList
+//                .stream()
+//                .map(Error::getKind)
+//                .collect(Collectors.joining("\n"));
 
         EditorFactory editorFactory = new EditorFactoryImpl(EditorActionManager.getInstance());
 
-        RegexpFilter fileRefsFilter = new RegexpFilter(project, "$FILE_PATH$:$LINE$");
-        // todo: crazy shit ):
-        errorsEditor = editorFactory.createViewer(editorFactory.createDocument(allErrors), project);
+        fileRefsFilter = new RegexpFilter(project, "$FILE_PATH$:$LINE$");
+        errorsEditor = editorFactory.createViewer(editorFactory.createDocument(DEFAULT_ERRORS_TEXT), project);
         hyperlinks = new EditorHyperlinkSupport(errorsEditor, project);
+        // todo: count lines!!!!!!!!!
         hyperlinks.highlightHyperlinks(fileRefsFilter, 0,1);
 
-//        ValgrindErrorsConsoleView errorsView = new ValgrindErrorsConsoleView(project, allErrors);
-
-
-
         mainPanel.setSecondComponent(errorsEditor.getComponent());
+    }
+
+    public void refreshErrors() {
+        String allErrors;
+        try {
+            ErrorsHolder errors = Parser.parse(pathToXml);
+            allErrors = "/home/bronti/all/au/devDays/test/cpptest/main.cpp:5\n\n\n";
+        }
+        catch (Exception ex) {
+            allErrors = DEFAULT_ERRORS_TEXT;
+//            allErrors = ERROR_ERRORS_TEXT;
+        }
+        final String finalText = allErrors;
+
+        hyperlinks.clearHyperlinks();
+        ApplicationManager.getApplication().invokeLater(()-> {
+            ApplicationManager.getApplication().runWriteAction(() ->{
+                errorsEditor.getDocument().setText(finalText);
+                // todo: count lines!!!!!!!!!
+                hyperlinks.highlightHyperlinks(fileRefsFilter, 0, 1);
+//                mainPanel.setSecondComponent(errorsEditor.getComponent());
+            });
+        });
+
+
     }
 
     @Override

@@ -3,6 +3,10 @@ package ru.spbau.devdays.clionvalgrind.results;
 import com.google.common.collect.Lists;
 import com.intellij.execution.filters.Filter;
 import com.intellij.execution.filters.TextConsoleBuilder;
+import com.intellij.execution.filters.TextConsoleBuilderFactory;
+import com.intellij.execution.process.ProcessAdapter;
+import com.intellij.execution.process.ProcessEvent;
+import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
@@ -11,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.spbau.devdays.clionvalgrind.parser.Parser;
 import ru.spbau.devdays.clionvalgrind.parser.errors.ErrorsHolder;
+import sun.java2d.loops.ProcessPath;
 
 import java.util.ArrayList;
 
@@ -20,13 +25,13 @@ import java.util.ArrayList;
 public class ValgrindRunConsoleBuilder extends TextConsoleBuilder {
     private final Project project;
     private final ArrayList<Filter> myFilters = Lists.newArrayList();
-    private ConsoleView console;
     private String pathToXml;
+    private ProcessHandler process;
 
-    public ValgrindRunConsoleBuilder(final Project project, ConsoleView console, String pathToXml) {
+    public ValgrindRunConsoleBuilder(final Project project, ProcessHandler process, String pathToXml) {
         this.project = project;
-        this.console = console;
         this.pathToXml = pathToXml;
+        this.process = process;
     }
 
     @Override
@@ -39,15 +44,17 @@ public class ValgrindRunConsoleBuilder extends TextConsoleBuilder {
     }
 
     protected ConsoleView createConsole() {
-        ErrorsHolder errors;
-        try {
-            errors = Parser.parse(pathToXml);
-        }
-        catch (Exception ex) {
-            errors = new ErrorsHolder();
-//            throw new IllegalStateException();
-        }
-        return new ValgrindConsoleView(project, console, errors);
+        ConsoleView outputConsole = TextConsoleBuilderFactory.getInstance().createBuilder(project).getConsole();
+        outputConsole.attachToProcess(process);
+
+        ValgrindConsoleView resultConsole = new ValgrindConsoleView(project, outputConsole, pathToXml);
+        process.addProcessListener(new ProcessAdapter() {
+            @Override
+            public void processTerminated(ProcessEvent event) {
+                resultConsole.refreshErrors();
+            }
+        });
+        return resultConsole;
     }
 
     @Override
