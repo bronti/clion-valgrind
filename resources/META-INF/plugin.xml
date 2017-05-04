@@ -30,12 +30,4 @@
     <!--<toolWindow id="Valgrind Results" secondary="true" icon="/pngs/icon.png" anchor="bottom" factoryClass="ru.spbau.devdays.clionvalgrind.results.ValgrindResultsWindowFactory"/>-->
     <!--<toolWindow id="Sample Calendar" secondary="true" icon="/myToolWindow/plus.png" anchor="right"-->
   </extensions>
-
-  <actions>
-    <action id="ru.spbau.devdays.clionvalgrind.DoSomething" class="ru.spbau.devdays.clionvalgrind.DoSomething"
-            text="DoSomething" description="DoSomething">
-      <add-to-group group-id="ToolsMenu" anchor="first"/>
-      <keyboard-shortcut keymap="$default" first-keystroke="ctrl UP"/>
-    </action>
-  </actions>
 </idea-plugin>
