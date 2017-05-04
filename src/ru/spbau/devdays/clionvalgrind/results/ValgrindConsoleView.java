@@ -24,6 +24,7 @@ import com.intellij.ui.*;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.ui.treeStructure.SimpleTreeBuilder;
 import com.intellij.ui.treeStructure.SimpleTreeStructure;
+import com.intellij.ui.treeStructure.Tree;
 import com.intellij.ui.treeStructure.treetable.ListTreeTableModelOnColumns;
 import com.intellij.ui.treeStructure.treetable.TreeColumnInfo;
 import com.intellij.ui.treeStructure.treetable.TreeTable;
@@ -79,12 +80,6 @@ public class ValgrindConsoleView implements ConsoleView {
         JComponent consoleComponent = console.getComponent();
         mainPanel.setFirstComponent(consoleComponent);
 
-//        // todo: fix when ErrorsHolder becomes Iterable
-//        String allErrors = errors.errorList
-//                .stream()
-//                .map(Error::getKind)
-//                .collect(Collectors.joining("\n"));
-
         EditorFactory editorFactory = new EditorFactoryImpl(EditorActionManager.getInstance());
 
         fileRefsFilter = new RegexpFilter(project, "$FILE_PATH$:$LINE$");
@@ -94,31 +89,41 @@ public class ValgrindConsoleView implements ConsoleView {
         hyperlinks.highlightHyperlinks(fileRefsFilter, 0,1);
 
         mainPanel.setSecondComponent(errorsEditor.getComponent());
+
+//        JTree tree = new Tree(errors.getTree());
+//        tree.add(new JScrollBar(Adjustable.HORIZONTAL));
+//        tree.add("hello", new JLabel("world"));
+//        String tmp = errors.toString();
+//        EditorFactory editorFactory = new EditorFactoryImpl(EditorActionManager.getInstance());
+//        Editor errorsEditor = editorFactory.createViewer(editorFactory.createDocument(tmp), project);
+//        mainPanel.setSecondComponent(tree);
+//        mainPanel.setSecondComponent(errorsEditor.getComponent());
     }
 
     public void refreshErrors() {
         String allErrors;
+        int linesCount = 1;
         try {
             ErrorsHolder errors = Parser.parse(pathToXml);
-            allErrors = "/home/bronti/all/au/devDays/test/cpptest/main.cpp:5\n\n\n";
+//            allErrors = "/home/bronti/all/au/devDays/test/cpptest/main.cpp:5\n\n\n";
+            allErrors = errors.toString();
+            linesCount = allErrors.split("\r\n|\r|\n").length - 1;
         }
         catch (Exception ex) {
             allErrors = DEFAULT_ERRORS_TEXT;
-//            allErrors = ERROR_ERRORS_TEXT;
         }
         final String finalText = allErrors;
+        final int finalLinesCount = linesCount;
 
         hyperlinks.clearHyperlinks();
         ApplicationManager.getApplication().invokeLater(()-> {
             ApplicationManager.getApplication().runWriteAction(() ->{
                 errorsEditor.getDocument().setText(finalText);
                 // todo: count lines!!!!!!!!!
-                hyperlinks.highlightHyperlinks(fileRefsFilter, 0, 1);
+                hyperlinks.highlightHyperlinks(fileRefsFilter, 0, finalLinesCount);
 //                mainPanel.setSecondComponent(errorsEditor.getComponent());
             });
         });
-
-
     }
 
     @Override
