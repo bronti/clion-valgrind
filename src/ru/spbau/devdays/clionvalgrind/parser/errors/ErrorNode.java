@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.util.List;
 
 public class ErrorNode {
+
     private String what;
     private List<String> funcList;
     private List<String> dirList;

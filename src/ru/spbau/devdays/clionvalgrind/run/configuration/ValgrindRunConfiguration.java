@@ -8,8 +8,6 @@ import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.cidr.cpp.cmake.CMakeSettings;
-import com.jetbrains.cidr.cpp.cmake.model.CMakeListener;
-import com.jetbrains.cidr.cpp.cmake.model.CMakeMessage;
 import com.jetbrains.cidr.cpp.cmake.workspace.CMakeWorkspace;
 import com.intellij.openapi.util.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -20,9 +18,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-public class ValgrindRunConfiguration  extends RunConfigurationBase {
+public class ValgrindRunConfiguration extends RunConfigurationBase {
     Project myProject;
-
     protected ValgrindRunConfiguration(Project project, ConfigurationFactory factory, String name) {
         super(project, factory, name);
         myProject = project;
@@ -71,6 +68,12 @@ public class ValgrindRunConfiguration  extends RunConfigurationBase {
 
     private RunProfileState createCommandLineState(@NotNull ExecutionEnvironment executionEnvironment,
                                                    GeneralCommandLine commandLine) {
-        return new ValgrindCommandLineState(executionEnvironment, commandLine);
+        // todo: only run/debug/wcoverage
+        // todo: String -> Path
+        String pathToExecutable = "/cmake-build-debug/" + executionEnvironment.getProject().getName();
+        String pathToXml = "/cmake-build-debug/" + executionEnvironment.getProject().getName() + "-valgrind-results.xml";
+        GeneralCommandLine cl = new GeneralCommandLine("valgrind", "--xml=yes", "--xml-file=" + pathToXml, pathToExecutable);
+        cl = cl.withWorkDirectory(executionEnvironment.getProject().getBasePath());
+        return new ValgrindCommandLineState(executionEnvironment, pathToXml, cl);
     }
 }
