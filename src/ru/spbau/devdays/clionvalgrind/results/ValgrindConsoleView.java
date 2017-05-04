@@ -67,17 +67,7 @@ public class ValgrindConsoleView implements ConsoleView {
         JComponent consoleComponent = console.getComponent();
         mainPanel.setFirstComponent(consoleComponent);
 
-        // todo: fix when ErrorsHolder becomes Iterable
-        String allErrors = errors.errorList
-                .stream()
-                .map(Error::getKind)
-                .collect(Collectors.joining("\n"));
-
-
-        String tmp = "main.cpp:5 memory leak, все дела.\n\nЗдесь должны отображаться ошибки, но пока нет, т к я накосячила с путем к xml'ке и пока не успела разобраться";
-
-//        JTextArea text = new JTextArea(allErrors);
-
+        String tmp = errors.toString();
         EditorFactory editorFactory = new EditorFactoryImpl(EditorActionManager.getInstance());
         Editor errorsEditor = editorFactory.createViewer(editorFactory.createDocument(tmp), project);
 

@@ -76,7 +76,8 @@ public class ValgrindRunConfiguration extends RunConfigurationBase {
         // todo: String -> Path
         String pathToExecutable = getBuildDir() + "/" + executionEnvironment.getProject().getName();
         String pathToXml = getBuildDir() + "/" + executionEnvironment.getProject().getName() + "-valgrind-results.xml";
-        GeneralCommandLine cl = new GeneralCommandLine("valgrind", "--xml=yes", "--xml-file=" + pathToXml, pathToExecutable);
+        GeneralCommandLine cl = new GeneralCommandLine("valgrind", "--leak-check=full",
+                "--xml=yes", "--xml-file=" + pathToXml, pathToExecutable);
         cl = cl.withWorkDirectory(executionEnvironment.getProject().getBasePath());
         return new ValgrindCommandLineState(executionEnvironment, pathToXml, cl);
     }

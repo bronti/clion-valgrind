@@ -31,12 +31,14 @@ public class Error {
         this.kind = kind;
     }
 
-    void print(OutputStream os) throws IOException {
-        os.write(kind.getBytes());
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(kind);
         for (ErrorNode anErrorNodeList : errorNodeList) {
-            os.write(System.lineSeparator().getBytes());
-            anErrorNodeList.print(os);
+            sb.append(System.lineSeparator());
+            sb.append(anErrorNodeList.toString());
         }
+        return sb.toString();
     }
 
 }
