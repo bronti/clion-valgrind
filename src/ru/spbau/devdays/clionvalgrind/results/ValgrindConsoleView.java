@@ -7,6 +7,13 @@ import com.intellij.execution.ui.ConsoleView;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.editor.actionSystem.EditorActionManager;
+import com.intellij.openapi.editor.impl.DocumentImpl;
+import com.intellij.openapi.editor.impl.EditorFactoryImpl;
+import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.*;
@@ -57,7 +64,8 @@ public class ValgrindConsoleView implements ConsoleView {
         this.console = console;
         this.errors = errors;
         mainPanel = new JBSplitter();
-        mainPanel.setFirstComponent(console.getComponent());
+        JComponent consoleComponent = console.getComponent();
+        mainPanel.setFirstComponent(consoleComponent);
 
         // todo: fix when ErrorsHolder becomes Iterable
         String allErrors = errors.errorList
@@ -65,13 +73,18 @@ public class ValgrindConsoleView implements ConsoleView {
                 .map(Error::getKind)
                 .collect(Collectors.joining("\n"));
 
-        // todo: uncomment when troubles with xml resolved
+
+        String tmp = "main.cpp:5 memory leak, все дела.\n\nЗдесь должны отображаться ошибки, но пока нет, т к я накосячила с путем к xml'ке и пока не успела разобраться";
+
 //        JTextArea text = new JTextArea(allErrors);
 
-        JTextArea text = new JTextArea("main.cpp:5 memory leak, все дела.\n\n Здесь должны отображаться ошибки, но пока нет, т к я накосячила с путем к xml'ке и пока не успела разобраться");
-        text.setEditable(false);
+        EditorFactory editorFactory = new EditorFactoryImpl(EditorActionManager.getInstance());
+        Editor errorsEditor = editorFactory.createViewer(editorFactory.createDocument(tmp), project);
 
-        mainPanel.setSecondComponent(text);
+        // todo: uncomment when troubles with xml resolved
+//        EditorImpl text = new EditorImpl(new DocumentImpl(allErrors), true, project);
+
+        mainPanel.setSecondComponent(errorsEditor.getComponent());
     }
 
     @Override
@@ -92,7 +105,7 @@ public class ValgrindConsoleView implements ConsoleView {
     public void scrollTo(int offset) {}
 
     @Override
-    public void attachToProcess(ProcessHandler processHandler) {}
+    public void attachToProcess(ProcessHandler processHandler) { console.attachToProcess(processHandler); }
 
     @Override
     public void setOutputPaused(boolean value) {}
@@ -114,7 +127,7 @@ public class ValgrindConsoleView implements ConsoleView {
     public void setHelpId(@NotNull String helpId) {}
 
     @Override
-    public void addMessageFilter(@NotNull Filter filter) {}
+    public void addMessageFilter(@NotNull Filter filter) { console.addMessageFilter(filter); }
 
     @Override
     public void printHyperlink(@NotNull String hyperlinkText, HyperlinkInfo info) {}
@@ -140,6 +153,6 @@ public class ValgrindConsoleView implements ConsoleView {
 
     @Override
     public JComponent getPreferredFocusableComponent() {
-        return console.getPreferredFocusableComponent();
+        return mainPanel.getSecondComponent();
     }
 }
