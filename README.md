@@ -1,6 +1,6 @@
 # CLion Plug-in: valgrind memory analyzer
 
-## [Альтернативная версия](https://github.com/YorovSobir/clion-valgrind)
+## [Альтернативная версия плагина](https://github.com/YorovSobir/clion-valgrind)
 
 ## Зависимости
 1. Последняя версия Intellij IDEA (2017.1.2) а также CLion (2017.1)
